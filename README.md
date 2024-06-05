@@ -11,20 +11,21 @@ pip install facextool
 ```
 #### Run faceX
 ```
-from facex.component import run
+import torch
+from .component import run
 
-# define the name of the target attribute e.g. "Gender" 
+# define the name of the target attribute e.g. "Gender"
 target = "task"
-# define the name of the protected attribute e.g. "Gender" 
+# define the name of the protected attribute e.g. "Gender"
 protected = "protected"
-# define the path of the pretrained model
-model_path = "<path/to/model>.pt"
-# define the data directory 
+# load your model
+model = torch.load("your_model.pt")
+# define the data directory
 data_dir = "<path/to/data>"
 # csv should involve all these three columns: img|<task>|<protected>
 csv_dir = "<path/to/annotations>.csv"
 # set the model's target layer for gradcam
-target_layer = "layer4"
+target_layer = "layer4"  # e.g. layer4 from resnet18
 # set a specific class ("eg Male") for the target (eg "Gender").
 target_class = 1
 
@@ -32,7 +33,7 @@ fig_heatmap, fig_patches, html = run(
     target,
     protected,
     target_class,
-    model_path,
+    model,
     data_dir,
     csv_dir,
     target_layer,
@@ -43,4 +44,15 @@ with open("facex_plots.html", "w") as f:
     f.write(html)
 
 ```
+
+### If you find this code useful in your research, please consider citing:
+```
+@inproceedings{sarridis2024facex,
+  title={FaceX : Understanding Face Attribute Classifiers through Summary Model Explanations},
+  author={Sarridis, Ioannis and Koutlis, Christos and Papadopoulos, Symeon and Diou, Christos},
+  booktitle={Proceedings of the 2024 ACM International Conference on Multimedia Retrieval},
+  year={2024}
+}
+```
+
 
