@@ -328,7 +328,6 @@ def run(
 
     config["protected"] = protected
 
-    config["model_path"] = model_path
     config["device"] = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Set the random seed for reproducibility
