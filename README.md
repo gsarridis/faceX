@@ -12,7 +12,7 @@ pip install facextool
 #### Run faceX
 ```
 import torch
-from .component import run
+from facex.component import run
 
 # define the name of the target attribute e.g. "Gender"
 target = "task"
