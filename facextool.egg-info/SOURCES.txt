@@ -1,0 +1,15 @@
+setup.py
+facex/__init__.py
+facex/component.py
+facex/dataset.py
+facex/face_model_v3.json
+facex/farl.py
+facex/hat_glasses.json
+facex/nn_utils.py
+facex/plot_facex.py
+facex/run.py
+facextool.egg-info/PKG-INFO
+facextool.egg-info/SOURCES.txt
+facextool.egg-info/dependency_links.txt
+facextool.egg-info/requires.txt
+facextool.egg-info/top_level.txt

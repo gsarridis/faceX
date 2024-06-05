@@ -1,0 +1,10 @@
+numpy
+opencv_python
+Pillow
+pyfacer
+matplotlib==3.8.1
+torch
+torchvision
+tqdm
+pandas
+grad_cam==1.4.8

@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: facextool
+Version: 0.0.11
+Summary: An XAI fairness assessment framework for face attribute classifiers
+Home-page: https://github.com/gsarridis/faceX
+Author: Ioannis Sarridis
+Author-email: gsarridis@iti.gr
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
+FaceX is a toolkit for understanding face attribute classifiers through summary model explanations<br>**Repository:** https://github.com/gsarridis/faceX
