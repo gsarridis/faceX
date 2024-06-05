@@ -174,7 +174,7 @@ def plot(face_prototype_dir, hat_glasses_prototype_dir, region_weights):
     plt.axis("off")
     plt.subplots_adjust(wspace=-0.46)
 
-    plt.savefig("facex.png", bbox_inches="tight")
+    # plt.savefig("facex.png", bbox_inches="tight")
 
     plt.show()
     return fig

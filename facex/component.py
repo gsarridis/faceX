@@ -272,7 +272,7 @@ def run(
     target,
     protected,
     target_class,
-    model_path,
+    model,
     data_dir,
     csv_dir,
     target_layer,
@@ -314,8 +314,14 @@ def run(
     config["bs"] = 1
     config["nw"] = 1
     config["K_top_patches"] = 20
-    config["face_prototype_dir"] = "./face_model_v3.json"
-    config["hat_glasses_prototype_dir"] = "./hat_glasses.json"
+    # Get the directory of the current file
+    current_directory = os.path.dirname(__file__)
+
+    # Construct the paths relative to the current file's directory
+    config["face_prototype_dir"] = os.path.join(current_directory, "face_model_v3.json")
+    config["hat_glasses_prototype_dir"] = os.path.join(
+        current_directory, "hat_glasses.json"
+    )
 
     config["target"] = target
     config["target_class"] = target_class
@@ -332,9 +338,6 @@ def run(
     rt = config["target_class"]
     rt_name = str(rt) + config["target"]
     # Create the CNN model
-    model = resnet.resnet18()
-    model.fc = nn.Linear(model.fc.in_features, 2)
-    model.load_state_dict(torch.load(config["model_path"])["model_state_dict"])
     model = model.to(config["device"])
     model.eval()
     test_loader = get_dataloaders(

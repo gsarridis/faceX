@@ -1,3 +1,5 @@
+LICENSE
+README.md
 setup.py
 facex/__init__.py
 facex/component.py

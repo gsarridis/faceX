@@ -16,7 +16,7 @@ long_description = (
 
 setuptools.setup(
     name="facextool",
-    version="0.0.11",
+    version="0.1.0",
     author="Ioannis Sarridis",
     author_email="gsarridis@iti.gr",
     description="An XAI fairness assessment framework for face attribute classifiers",
