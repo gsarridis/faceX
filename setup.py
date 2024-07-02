@@ -16,7 +16,7 @@ long_description = (
 
 setuptools.setup(
     name="facextool",
-    version="0.1.1",
+    version="0.1.2",
     author="Ioannis Sarridis",
     author_email="gsarridis@iti.gr",
     description="An XAI fairness assessment framework for face attribute classifiers",
@@ -40,6 +40,7 @@ setuptools.setup(
         "tqdm",
         "pandas",
         "grad_cam==1.4.8",
+        "timm",
     ],
     python_requires=">=3.6",
     package_data={"facex": ["hat_glasses.json", "face_model_v3.json"]},

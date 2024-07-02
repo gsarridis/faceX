@@ -8,3 +8,4 @@ torchvision
 tqdm
 pandas
 grad_cam==1.4.8
+timm
