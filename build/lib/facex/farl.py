@@ -12,6 +12,10 @@ import facer
 import matplotlib.pyplot as plt
 
 
+def identity(x):
+    return x
+
+
 def find_all_images(
     root_dir, extensions=(".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp")
 ):
@@ -73,7 +77,7 @@ def create_masks(respth="./res/test_res", dspth="./data", image_paths=[]):
     }
 
     face_parser = facer.face_parser("farl/celebm/448", device=device)
-
+    facer.transform.get_quad = identity
     with torch.no_grad():
         if len(image_paths) == 0:
             image_paths = find_all_images(dspth)

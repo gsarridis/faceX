@@ -1,4 +1,5 @@
 import torch
+from torchvision import transforms
 from .component import run
 
 # define the name of the target attribute e.g. "Gender"
@@ -15,6 +16,16 @@ csv_dir = "<path/to/annotations>.csv"
 target_layer = "layer4"  # e.g. layer4 from resnet18
 # set a specific class ("eg Male") for the target (eg "Gender").
 target_class = 1
+# set the desired image size
+img_size = 512
+# set your data transforms
+transform = transforms.Compose(
+    [
+        transforms.Resize((img_size, img_size)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+    ]
+)
 
 fig_heatmap, fig_patches, html = run(
     target,
@@ -24,6 +35,8 @@ fig_heatmap, fig_patches, html = run(
     data_dir,
     csv_dir,
     target_layer,
+    transform,
+    img_size,
 )
 
 # Save the HTML file

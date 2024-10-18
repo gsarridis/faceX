@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: facextool
-Version: 0.1.2
+Version: 0.1.11
 Summary: An XAI fairness assessment framework for face attribute classifiers
 Home-page: https://github.com/gsarridis/faceX
 Author: Ioannis Sarridis

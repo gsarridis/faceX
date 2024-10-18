@@ -188,41 +188,109 @@ class CustomDatasetMask(Dataset):
         return self.y.shape[0]
 
 
-# def balance_set(df, task, protected):
-#     p0 = 0
-#     p1 = 1
+class CustomDatasetMaskImagePairs(Dataset):
+    """Custom Dataset for loading  face image pairs"""
 
-#     df.loc[df[task] == -1, task] = 0
-#     df.loc[df[protected] == -1, protected] = 0
-#     if protected == "None":
-#         return df, p0, p1
-#     A11 = df[(df[task] == 1) & (df[protected] == p0)]
-#     A10 = df[(df[task] == 1) & (df[protected] == p1)]
-#     A01 = df[(df[task] == 0) & (df[protected] == p0)]
-#     A00 = df[(df[task] == 0) & (df[protected] == p1)]
+    def __init__(
+        self,
+        csv_df,
+        data_dir,
+        att_dir,
+        att_list,
+        att_transform,
+        att_crop,
+        task,
+        transform=None,
+        get_path=False,
+        get_att=True,
+    ):
+        self.data_dir = data_dir
+        # TODO: add img_names2 that found in column 1 of df
+        # TODO: load 2 images, but get the att of only the second one, the first one acts as target!
+        # theoriticaly DONE
+        self.img_names = csv_df.iloc[:, 1].values
+        self.img_names_reference = csv_df.iloc[:, 0].values
+        self.y = csv_df[task].values
+        self.transform = transform
+        self.att_dir = att_dir
+        self.att_list = att_list
+        self.att_transform = att_transform
+        self.get_path = get_path
+        self.get_att = get_att
+        self.att_crop = att_crop
+        # TODO: maybe dont use all the data, only the ones that are involved in the csv! Ok, get_all_img_paths does exactly this job. So, already done.
+        img_paths = self.get_all_img_paths(data_dir)
+        self.processed_att_img_paths = []
+        # TODO: the below lines make no sense. try to understand. Ok, this function doesnt search existing images, but says which paths should exist!
+        att_img_paths = self.get_all_img_paths(att_dir)
+        for path in att_img_paths:
+            new_path = path[:-4]
+            self.processed_att_img_paths.append(new_path)
+        if not self.check_any_path_starts_with():
+            create_masks(
+                dspth=self.data_dir, respth=self.att_dir, image_paths=img_paths
+            )
 
-#     S00 = len(A00)
-#     S01 = len(A01)
-#     S10 = len(A10)
-#     S11 = len(A11)
-#     if S00 > S01:
-#         S00 = S01
-#     else:
-#         S01 = S00
-#     if S11 > S10:
-#         S11 = S10
-#     else:
-#         S10 = S11
+    def check_any_path_starts_with(self):
+        masks = find_all_images(self.att_dir)
+        for path in self.processed_att_img_paths:
+            if has_matching_files(masks, path):
+                # TODO: check here, propably we should use continue instead of return. I dont know why i comented out!
+                return True
+                # continue
+            else:
+                return False
+        return True
 
-#     df_new = pd.concat(
-#         [
-#             A00.head(S00),
-#             A01.head(S01),
-#             A10.head(S10),
-#             A11.head(S11),
-#         ]
-#     )
-#     return df_new, p0, p1
+    def get_all_img_paths(self, d_dir):
+        img_paths = []
+        for index in range(len(self.img_names)):
+            img_path = os.path.join(d_dir, self.img_names[index])
+            img_paths.append(img_path)
+        return img_paths
+
+    def __getitem__(self, index):
+        # TODO: load 2 images, but get the att of only the second one, the first one acts as target!
+        # theoriticaly DONE
+        # Load the image and corresponding label
+        img_path = os.path.join(self.data_dir, self.img_names[index])
+        img_path_reference = os.path.join(
+            self.data_dir, self.img_names_reference[index]
+        )
+        img = Image.open(img_path)
+        img = self.transform(img) if self.transform else img
+
+        img_reference = Image.open(img_path_reference)
+        img_reference = (
+            self.transform(img_reference) if self.transform else img_reference
+        )
+
+        label = self.y[index]
+
+        # Load the attention map if needed
+        atts = {}
+        # att_all = torch.zeros((1, self.att_crop, self.att_crop))
+        if self.get_att:
+            for a in self.att_list:
+                img_name = self.img_names[index].split(".")[:-1]
+                img_name = ".".join(img_name)
+                img_name_all = img_name + "_" + a + ".png"
+                pth = os.path.join(self.att_dir, img_name_all)
+                if os.path.isfile(pth):
+                    att = Image.open(pth).convert("L")
+                    att = self.att_transform(att)
+                    atts[a] = att
+        # Prepare the return values
+        return_values = [img_reference, img, label]
+        if self.get_att:
+            return_values.append(atts)
+        if self.get_path:
+            return_values.append(img_path)
+
+        return tuple(return_values)
+
+    def __len__(self):
+        return self.y.shape[0]
 
 
 def balance_set(df, task, protected):
@@ -264,15 +332,18 @@ def get_dataloaders(
     bs=64,
     nw=4,
     one_class=-1,
+    transform=None,
 ):
-
-    transform_test = transforms.Compose(
-        [
-            transforms.Resize((img_size, img_size)),
-            transforms.ToTensor(),
-            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-        ]
-    )
+    if transform is None:
+        transform_test = transforms.Compose(
+            [
+                transforms.Resize((img_size, img_size)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+            ]
+        )
+    else:
+        transform_test = transform
 
     att_transform = transforms.Compose(
         [
@@ -325,6 +396,67 @@ def get_dataloaders(
             get_path=True,
             get_att=True,
         )
+    test_loader = DataLoader(
+        dataset=test_data, batch_size=bs, shuffle=False, num_workers=nw
+    )
+    return test_loader
+
+
+def get_dataloader_embeddings(
+    #  dataset, #not needed
+    task,
+    protected,
+    data_dir,
+    csv_dir,
+    att_dir,
+    att_list,
+    img_size=128,
+    bs=64,
+    nw=4,
+    one_class=-1,
+    transform=None,
+):
+    if transform is None:
+        transform_test = transforms.Compose(
+            [
+                transforms.Resize((img_size, img_size)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+            ]
+        )
+    else:
+        transform_test = transform
+
+    att_transform = transforms.Compose(
+        [
+            transforms.Resize((img_size, img_size)),
+            transforms.ToTensor(),
+        ]
+    )
+
+    # TODO: it doesn't make any sense to balance the data for the fv scenario.
+    # Instead, try to select a subset of the data based on the selected protected attribute class beforehand (eg race-> black),
+    # to show how the model makes decesions for a specific race.
+    # TODO: maybe get the dataloader directly from mammoth-commons, see the relevant elmokhtar's file in slack.
+    # or second option (better that first): use mammoth commons only to load the csv and then use facex to create the data class and loader.
+
+    df = pd.read_csv(csv_dir, sep=",")
+
+    if one_class > -1:
+        df = df[(df[task] == one_class)]
+
+    test_data = CustomDatasetMaskImagePairs(
+        df,
+        data_dir,
+        att_dir,
+        att_list,
+        att_transform,
+        img_size,
+        task,
+        transform_test,
+        get_path=True,
+        get_att=True,
+    )
     test_loader = DataLoader(
         dataset=test_data, batch_size=bs, shuffle=False, num_workers=nw
     )
