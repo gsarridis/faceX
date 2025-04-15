@@ -702,7 +702,7 @@ def run_embeddings_mammoth(dataset, protected, target_class, model, target_layer
     ]
     config["seed"] = 1
     config["bs"] = 1
-    config["nw"] = 1
+    config["nw"] = 0
     config["K_top_patches"] = 20
     # Get the directory of the current file
     current_directory = os.path.dirname(__file__)
@@ -748,4 +748,7 @@ def run_embeddings_mammoth(dataset, protected, target_class, model, target_layer
     patches, heatmap, combined_html = facex_embeddings(
         test_loader, model, config, [rt_name, rt]
     )
+
+    # Close all open plots or figures
+    plt.close("all")
     return combined_html

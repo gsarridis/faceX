@@ -157,8 +157,7 @@ class CustomDatasetMask(Dataset):
     def __getitem__(self, index):
         # Load the image and corresponding label
         img_path = os.path.join(self.data_dir, self.img_names[index])
-        img = Image.open(img_path)
-        img = self.transform(img) if self.transform else img
+        img = self.transform(img_path) if self.transform else Image.open(img_path)
 
         label = self.y[index]
 
@@ -257,12 +256,10 @@ class CustomDatasetMaskImagePairs(Dataset):
         img_path_reference = os.path.join(
             self.data_dir, self.img_names_reference[index]
         )
-        img = Image.open(img_path)
-        img = self.transform(img) if self.transform else img
+        img = self.transform(img_path) if self.transform else Image.open(img_path)
 
-        img_reference = Image.open(img_path_reference)
         img_reference = (
-            self.transform(img_reference) if self.transform else img_reference
+            self.transform(img_path_reference) if self.transform else Image.open(img_path_reference)
         )
 
         label = self.y[index]
