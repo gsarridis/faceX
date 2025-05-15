@@ -16,7 +16,7 @@ long_description = (
 
 setuptools.setup(
     name="facextool",
-    version="0.1.14",
+    version="0.1.15",
     author="Ioannis Sarridis",
     author_email="gsarridis@iti.gr",
     description="An XAI fairness assessment framework for face attribute classifiers",
@@ -30,7 +30,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        "numpy",
+        "numpy>=2",
         "opencv_python",
         "Pillow",
         "pyfacer",
