@@ -24,7 +24,7 @@ from .nn_utils import (
     CustomGradCAM,
     normalize_values,
 )
-from .plot_facex import plot
+from .plot_facex import plot, plot_fv
 from io import BytesIO
 import base64
 from torchvision import transforms
@@ -441,7 +441,7 @@ def facex_embeddings(test_loader, model, config, r_target):
 
     activations_frac_att = normalize_values(activations_frac_att, num_of_imgs)
 
-    facex_heatmap_plot = plot(
+    facex_heatmap_plot = plot_fv(
         config["face_prototype_dir"],
         config["hat_glasses_prototype_dir"],
         activations_frac_att,
