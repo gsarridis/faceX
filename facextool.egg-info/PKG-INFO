@@ -1,6 +1,6 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: facextool
-Version: 0.1.30
+Version: 0.1.43
 Summary: An XAI fairness assessment framework for face attribute classifiers
 Home-page: https://github.com/gsarridis/faceX
 Author: Ioannis Sarridis
@@ -15,12 +15,22 @@ Requires-Dist: numpy>=2
 Requires-Dist: opencv_python
 Requires-Dist: Pillow
 Requires-Dist: pyfacer
-Requires-Dist: matplotlib==3.8.1
+Requires-Dist: matplotlib>=3.10.3
 Requires-Dist: torch
 Requires-Dist: torchvision
 Requires-Dist: tqdm
 Requires-Dist: pandas
 Requires-Dist: grad_cam==1.4.8
 Requires-Dist: timm
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
 
 FaceX is a toolkit for understanding face attribute classifiers through summary model explanations<br>**Repository:** https://github.com/gsarridis/faceX

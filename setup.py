@@ -16,7 +16,7 @@ long_description = (
 
 setuptools.setup(
     name="facextool",
-    version="0.1.30",
+    version="0.1.43",
     author="Ioannis Sarridis",
     author_email="gsarridis@iti.gr",
     description="An XAI fairness assessment framework for face attribute classifiers",
@@ -34,7 +34,7 @@ setuptools.setup(
         "opencv_python",
         "Pillow",
         "pyfacer",
-        "matplotlib==3.8.1",
+        "matplotlib>=3.10.3",
         "torch",
         "torchvision",
         "tqdm",

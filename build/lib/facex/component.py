@@ -9,7 +9,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from PIL import Image
 import torchvision.transforms.functional as F
-
+import pandas as pd
 
 import torch
 import numpy as np
@@ -181,10 +181,10 @@ def update_top_patches(
     return tp, tpv, tin
 
 
-def global_focus(img1, att_maps, activations_frac_att, num_of_imgs):
+def global_focus(img1, att_maps, activations_frac_att, num_of_imgs, config):
     th = 0
     att_pixels = {}
-    # Load the images
+    img_act_frac_att = {key: 0.0 for key in config["att_list"]}
 
     pixels1 = np.array(img1) / 255
 
@@ -198,11 +198,10 @@ def global_focus(img1, att_maps, activations_frac_att, num_of_imgs):
     for att_dir in list(att_pixels.keys()):
         intersec = np.sum((pixels1 > th) & (att_pixels[att_dir] > 0))
         if np.sum(att_pixels[att_dir] > 0) > 0:
-            activations_frac_att[att_dir] += intersec / np.sum(
-                (att_pixels[att_dir] > 0)
-            )
+            img_act_frac_att[att_dir] = intersec / np.sum((att_pixels[att_dir] > 0))
+            activations_frac_att[att_dir] += img_act_frac_att[att_dir]
             num_of_imgs[att_dir] += 1
-    return activations_frac_att, num_of_imgs
+    return activations_frac_att, num_of_imgs, img_act_frac_att
 
 
 def facex(test_loader, model, config, r_target):
@@ -222,6 +221,8 @@ def facex(test_loader, model, config, r_target):
     target_class = [ClassifierOutputTarget(r_target[1])]
     activations_frac_att = {key: 0 for key in config["att_list"]}
     num_of_imgs = {key: 0 for key in config["att_list"]}
+    activation_records = []  # List of per-image activation rows
+
     use_cuda = config["device"] == torch.device("cuda")
     with CustomGradCAM(
         model=model, target_layers=target_layers, use_cuda=use_cuda
@@ -233,9 +234,11 @@ def facex(test_loader, model, config, r_target):
             att_map, norm_att_map = cam(input_tensor=data, targets=target_class)
             gradcam = Image.fromarray((norm_att_map[0, 0] * 255).astype(np.uint8))
             gradcam = gradcam.resize((64, 64))
-            activations_frac_att, num_of_imgs = global_focus(
-                gradcam, atts, activations_frac_att, num_of_imgs
+            activations_frac_att, num_of_imgs, img_act_frac_att = global_focus(
+                gradcam, atts, activations_frac_att, num_of_imgs, config
             )
+            img_act_frac_att["img"] = pth
+            activation_records.append(img_act_frac_att)
 
             patch_size = 16
             att_map = torch.tensor(att_map)
@@ -258,6 +261,10 @@ def facex(test_loader, model, config, r_target):
                         patch_size,
                     )
                 )
+
+        csv_output_path = os.path.join(config["data_dir"], "activations_per_sample.csv")
+        df = pd.DataFrame(activation_records)
+        df.to_csv(csv_output_path, index=False)
         facex_patch_plots = {}
         for region in list(atts.keys()):
             sorted_indices = sorted(
@@ -266,21 +273,36 @@ def facex(test_loader, model, config, r_target):
                 reverse=True,
             )
             sorted_images = [top_patches[region][i] for i in sorted_indices]
+            sorted_image_names = [top_img_names[region][i] for i in sorted_indices]
 
             # Take the top 20 images
             top_20_images = sorted_images[: config["K_top_patches"]]
+            top_K_image_names = sorted_image_names[: config["K_top_patches"]]
 
             # Plot the images
-            fig, axs = plt.subplots(1, config["K_top_patches"], figsize=(20, 1))
+            fig, axs = plt.subplots(1, config["K_top_patches"], figsize=(20, 2))
 
-            for i, img in enumerate(top_20_images):
+            for i, (img, image_name) in enumerate(
+                zip(top_20_images, top_K_image_names)
+            ):
                 img_array = img.detach().cpu().numpy()
                 img_array = np.transpose(img_array, (1, 2, 0))
 
                 axs[i].imshow(img_array)
-                # axs[i].title(image_name)
+                # axs[i].set_title(image_name)
+                axs[i].set_title(
+                    image_name,
+                    rotation=90,
+                    ha="center",
+                    va="center",
+                    x=-0.1,
+                    y=0.5,
+                    fontsize=8,
+                )  # x, y in axes coordinates (0-1)
+
             for i in range(config["K_top_patches"]):
                 axs[i].axis("off")
+            plt.tight_layout(pad=2.0)
             facex_patch_plots[region] = fig
             # plt.savefig("patches_" + region + ".png")
             # plt.show()
@@ -347,6 +369,7 @@ def facex_embeddings(test_loader, model, config, r_target):
     top_patch_values = {key: [] for key in config["att_list"]}
     top_img_names = {key: [] for key in config["att_list"]}
     target_layers = get_target_layers(model, config["target_layer"])
+    activation_records = []  # List of per-image activation rows
 
     activations_frac_att = {key: 0 for key in config["att_list"]}
     num_of_imgs = {key: 0 for key in config["att_list"]}
@@ -386,9 +409,11 @@ def facex_embeddings(test_loader, model, config, r_target):
             att_map, norm_att_map = cam(input_tensor=data1, targets=img0_target)
             gradcam = Image.fromarray((norm_att_map[0, 0] * 255).astype(np.uint8))
             gradcam = gradcam.resize((64, 64))
-            activations_frac_att, num_of_imgs = global_focus(
-                gradcam, atts, activations_frac_att, num_of_imgs
+            activations_frac_att, num_of_imgs, img_act_frac_att = global_focus(
+                gradcam, atts, activations_frac_att, num_of_imgs, config
             )
+            img_act_frac_att["img"] = pth
+            activation_records.append(img_act_frac_att)
 
             patch_size = 16
             att_map = torch.tensor(att_map)
@@ -411,33 +436,50 @@ def facex_embeddings(test_loader, model, config, r_target):
                         patch_size,
                     )
                 )
-        facex_patch_plots = {}
-        for region in list(atts.keys()):
-            sorted_indices = sorted(
-                range(len(top_patch_values[region])),
-                key=lambda i: top_patch_values[region][i],
-                reverse=True,
-            )
-            sorted_images = [top_patches[region][i] for i in sorted_indices]
 
-            # Take the top 20 images
-            top_20_images = sorted_images[: config["K_top_patches"]]
+    csv_output_path = os.path.join(config["data_dir"], "activations_per_sample.csv")
+    df = pd.DataFrame(activation_records)
+    df.to_csv(csv_output_path, index=False)
+    facex_patch_plots = {}
+    for region in list(atts.keys()):
+        sorted_indices = sorted(
+            range(len(top_patch_values[region])),
+            key=lambda i: top_patch_values[region][i],
+            reverse=True,
+        )
+        sorted_images = [top_patches[region][i] for i in sorted_indices]
+        sorted_image_names = [top_img_names[region][i] for i in sorted_indices]
 
-            # Plot the images
-            fig, axs = plt.subplots(1, config["K_top_patches"], figsize=(20, 1))
+        # Take the top 20 images
+        top_20_images = sorted_images[: config["K_top_patches"]]
+        top_K_image_names = sorted_image_names[: config["K_top_patches"]]
 
-            for i, img in enumerate(top_20_images):
-                img_array = img.detach().cpu().numpy()
-                img_array = np.transpose(img_array, (1, 2, 0))
+        # Plot the images
+        fig, axs = plt.subplots(1, config["K_top_patches"], figsize=(20, 2))
 
-                axs[i].imshow(img_array)
-                # axs[i].title(image_name)
-            for i in range(config["K_top_patches"]):
-                axs[i].axis("off")
-            facex_patch_plots[region] = fig
-            # plt.savefig("patches_" + region + ".png")
-            # plt.show()
-            # plt.close()
+        for i, (img, image_name) in enumerate(zip(top_20_images, top_K_image_names)):
+            img_array = img.detach().cpu().numpy()
+            img_array = np.transpose(img_array, (1, 2, 0))
+
+            axs[i].imshow(img_array)
+            # axs[i].set_title(image_name)
+            axs[i].set_title(
+                image_name,
+                rotation=90,
+                ha="center",
+                va="center",
+                x=-0.1,
+                y=0.5,
+                fontsize=8,
+            )  # x, y in axes coordinates (0-1)
+
+        for i in range(config["K_top_patches"]):
+            axs[i].axis("off")
+        plt.tight_layout(pad=2.0)
+        facex_patch_plots[region] = fig
+        # plt.savefig("patches_" + region + ".png")
+        # plt.show()
+        # plt.close()
 
     activations_frac_att = normalize_values(activations_frac_att, num_of_imgs)
 

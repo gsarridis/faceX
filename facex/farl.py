@@ -4,7 +4,7 @@
 from tqdm import tqdm
 
 import torch
-
+import torchvision
 import os
 import numpy as np
 import torch
@@ -120,15 +120,15 @@ def create_masks(respth="./res/test_res", dspth="./data", image_paths=[]):
                 vis_seg_probs = seg_probs[:, i, :, :].unsqueeze(1) * 255
                 vis_img = vis_seg_probs.sum(0, keepdim=True)
                 vis_img[vis_img < 128] = 0
-                vis_img[vis_img > 128] = 255
+                vis_img[vis_img >= 128] = 255
                 # Assuming vis_img is a torch tensor
-                vis_img_numpy = vis_img.squeeze().detach().cpu().numpy().astype(int)
+                # vis_img_numpy = vis_img.squeeze().detach().cpu().numpy().astype(int)
 
-                # Display the image using Matplotlib
-                plt.imshow(
-                    vis_img_numpy, cmap="gray"
-                )  # You can choose the colormap based on your preference
-                plt.axis("off")  # Turn off axis values
+                # # Display the image using Matplotlib
+                # plt.imshow(
+                #     vis_img_numpy, cmap="gray"
+                # )  # You can choose the colormap based on your preference
+                # plt.axis("off")  # Turn off axis values
 
                 output_path = image_path.replace(
                     dspth,
@@ -140,16 +140,20 @@ def create_masks(respth="./res/test_res", dspth="./data", image_paths=[]):
                 save_dir = os.path.splitext(output_path)[0]
                 output_path = f"{save_dir}_{atts_map[atts[i]]}.png"
                 # print(output_path)
-                if np.any(vis_img_numpy != 0):
-                    plt.savefig(output_path, bbox_inches="tight", pad_inches=0)
+
+                vis_img = vis_img.to(torch.float32) / 255.0
+                if torch.any(vis_img != 0):
+                    torchvision.utils.save_image(vis_img, output_path)
+                # if np.any(vis_img_numpy != 0):
+                #     plt.savefig(output_path, bbox_inches="tight", pad_inches=0)
 
                 # plt.show()
-                plt.close()
+                # plt.close()
 
 
 if __name__ == "__main__":
 
     create_masks(
         respth="./mask_results",
-        dspth="/fssd4/user-data/gsarridis/rfw/images/test_aligned",
+        dspth="../mammoth-commons/data/xai_images/race_per_7000/African",
     )

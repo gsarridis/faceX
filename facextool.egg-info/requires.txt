@@ -2,7 +2,7 @@ numpy>=2
 opencv_python
 Pillow
 pyfacer
-matplotlib==3.8.1
+matplotlib>=3.10.3
 torch
 torchvision
 tqdm

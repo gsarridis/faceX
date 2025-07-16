@@ -274,8 +274,8 @@ class CustomDatasetMaskImagePairs(Dataset):
                 img_name_all = img_name + "_" + a + ".png"
                 pth = os.path.join(self.att_dir, img_name_all)
                 if os.path.isfile(pth):
-                    att = Image.open(pth).convert("L")
-                    att = self.att_transform(att)
+                    # att = Image.open(pth).convert("L") 
+                    att = self.att_transform(pth)
                     atts[a] = att
         # Prepare the return values
         return_values = [img_reference, img, label]
@@ -421,15 +421,24 @@ def get_dataloader_embeddings(
                 transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
             ]
         )
-    else:
-        transform_test = transform
-
-    att_transform = transforms.Compose(
+        att_transform = transforms.Compose(
         [
             transforms.Resize((img_size, img_size)),
             transforms.ToTensor(),
         ]
     )
+    else:
+        transform_test = transform
+
+        img_loader_transform = transform_test.transforms[0]
+        att_transform = transforms.Compose(
+            [   
+                img_loader_transform,
+                transforms.Resize((img_size, img_size)),
+                transforms.Grayscale(num_output_channels=1),
+                transforms.ToTensor(),
+            ]
+        )
 
     # TODO: it doesn't make any sense to balance the data for the fv scenario.
     # Instead, try to select a subset of the data based on the selected protected attribute class beforehand (eg race-> black),
