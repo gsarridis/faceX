@@ -4,6 +4,15 @@
 ![FaceX overview](images/facex.JPG)
 ##### FaceX employs 19 facial regions and accessories to provide explanations (left: face regions, right: hat and glasses). Blue to red colors indicate low to high importance, respectively.  The provided illustration answers the questions "where does a model focus on?" and "what visual features trigger its focus?" through heatmap and high-impact patches visualizations, respectively. This example depicts a biased gender classifier trained on CelebA that effectively uses the Wearing_Lipstick attribute as a shortcut to predict Gender. Note that FaceX is compatible with any face dataset.
 
+<div align="center">
+
+![FaceX for face verification overview](images/facex_fv.png)
+</div>
+
+
+
+##### FaceX is also applicable to models operating in the feature space. In this example, a reference image is used the target class to compute Grad-CAM activations.
+
 ### How to run
 #### First install the facextool library
 ```
