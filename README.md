@@ -1,22 +1,84 @@
 # FaceX : Understanding Face Attribute Classifiers through Summary Model Explanations
 [![MAI_BIAS toolkit](https://img.shields.io/badge/MAI_BIAS-fairness_tools-blue?logo=github)](https://mammoth-eu.github.io/mammoth-commons/index.html)
 
+## 🌍 Overview
+**FaceX** is a powerful framework for analyzing and explaining **face recognition and attribute classification models**, with a strong focus on **fairness, transparency, and real-world reliability**.
 
-### This is the official pytorch implementation of FaceX
+It helps you answer critical questions like:
+- *Where does my model focus?*
+- *What visual features drive its decisions?*
+- *Is my model relying on biased shortcuts?*
+
+Whether you're building or evaluating AI systems, FaceX provides **actionable insights into model behavior across population groups**.
+
+---
+
+## 🎯 Who is this for?
+- **AI researchers** studying bias and interpretability  
+- **ML engineers** building face recognition / verification systems  
+- **Industry teams** deploying biometric or identity solutions  
+- **Product managers & decision-makers** ensuring trustworthy AI  
+
+---
+
+## 💡 Why FaceX matters
+- ✅ **Reveal hidden biases** in AI models  
+- ✅ **Understand model decisions visually**  
+- ✅ **Prevent costly deployment failures**  
+- ✅ **Build trustworthy and compliant AI systems**  
+
+---
+
+## 🔥 Key Features
+- Explain model decisions using:
+  - Heatmaps (attention visualization)
+  - High-impact visual patches
+- Supports both:
+  - Classification models 
+  - Feature-space models (e.g., face verification)
+- Works with **any face dataset**
+- Built on **Grad-CAM-based explanations**
+- Provides **human-interpretable insights**, not just metrics
+
+---
+
+## 🧠 What makes it powerful
+- Detects **shortcut learning** (e.g., lipstick → gender bias)
+- Highlights **spurious correlations**
+- Enables **fairness auditing without modifying models**
+- Bridges the gap between **research and real-world deployment**
+
+---
+
+## 🖼️ Example: Model Explanation
+
 ![FaceX overview](images/facex.JPG)
-##### FaceX employs 19 facial regions and accessories to provide explanations (left: face regions, right: hat and glasses). Blue to red colors indicate low to high importance, respectively.  The provided illustration answers the questions "where does a model focus on?" and "what visual features trigger its focus?" through heatmap and high-impact patches visualizations, respectively. This example depicts a biased gender classifier trained on CelebA that effectively uses the Wearing_Lipstick attribute as a shortcut to predict Gender. Note that FaceX is compatible with any face dataset.
+
+FaceX employs **19 facial regions and accessories** (e.g., eyes, hair, glasses, hat) to provide detailed explanations.
+
+- 🔵 Blue → Low importance  
+- 🔴 Red → High importance  
+
+👉 In the example above, a biased gender classifier relies heavily on the **“Wearing Lipstick”** attribute — a clear case of shortcut learning.
+
+FaceX answers:
+- **Where the model focuses** → via heatmaps  
+- **What triggers predictions** → via high-impact patches  
+
+---
 
 <div align="center">
 
 ![FaceX for face verification overview](images/facex_fv.png)
+
 </div>
 
+FaceX also supports **feature-space explanations**, where a reference image can define the target class (useful in face verification scenarios).
 
+---
 
-##### FaceX is also applicable to models operating in the feature space. In this example, a reference image is used the target class to compute Grad-CAM activations.
-
-### How to run
-#### First install the facextool library
+## ⚡ Quick Start
+#### Install the facextool library
 ```
 pip install facextool
 ```
@@ -56,7 +118,28 @@ with open("facex_plots.html", "w") as f:
 
 ```
 
-### If you find this code useful in your research, please consider citing:
+## 📊 What you can do with FaceX
+- Analyze bias across **demographics**
+- Detect **spurious correlations** in models
+- Compare model behavior across groups
+- Generate **visual reports for stakeholders**
+- Audit fairness in deployed systems
+
+---
+
+## 🌍 Real-world applications
+- Identity verification systems
+- Border control & surveillance  
+- Hiring and screening tools  
+
+---
+
+## 🧩 Part of a Larger Ecosystem
+FaceX is part of the MAI-BIAS Toolkit, consisting of numerous modules, which collectively form a complete pipeline for **building, analyzing, and validating fair AI systems**.
+
+---
+
+## 📖 Citation
 ```
 @inproceedings{sarridis2024facex,
   title={FaceX : Understanding Face Attribute Classifiers through Summary Model Explanations},
