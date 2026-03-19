@@ -1,6 +1,14 @@
 # FaceX : Understanding Face Attribute Classifiers through Summary Model Explanations
 [![MAI_BIAS toolkit](https://img.shields.io/badge/MAI_BIAS-fairness_tools-blue?logo=github)](https://mammoth-eu.github.io/mammoth-commons/index.html)
 
+This software is part of MAI-BIAS; a low-code toolkit for
+fairness analysis and mitigation, with an accompanying suite of coding
+tools. Our ecosystem operates in multidimensional and multi-attribute
+settings (safeguarding multiple races, genders, etc), and across multiple
+data modalities (like tabular data, images, text, graphs). Learn more
+[here](https://mammoth-eu.github.io/mammoth-commons/index.html).
+
+---
 ## 🌍 Overview
 **FaceX** is a powerful framework for analyzing and explaining **face recognition and attribute classification models**, with a strong focus on **fairness, transparency, and real-world reliability**.
 
@@ -131,11 +139,6 @@ with open("facex_plots.html", "w") as f:
 - Identity verification systems
 - Border control & surveillance  
 - Hiring and screening tools  
-
----
-
-## 🧩 Part of a Larger Ecosystem
-FaceX is part of the MAI-BIAS Toolkit, consisting of numerous modules, which collectively form a complete pipeline for **building, analyzing, and validating fair AI systems**.
 
 ---
 
