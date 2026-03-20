@@ -22,7 +22,7 @@ Whether you're building or evaluating AI systems, FaceX provides **actionable in
 ---
 
 ## 🎯 Who is this for?
-- **AI researchers** studying bias and interpretability  
+- **AI researchers** studying bias and explainability  
 - **ML engineers** building face recognition / verification systems  
 - **Industry teams** deploying biometric or identity solutions  
 - **Product managers & decision-makers** ensuring trustworthy AI  
